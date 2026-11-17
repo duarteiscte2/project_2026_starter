@@ -6,32 +6,23 @@ import pt.iscte.poo.utils.Point2D;
 
 import java.util.Random;
 
-public class Baba implements ImageTile {
+public class Baba extends Actor {
 
-    private Point2D position;
-    private String direction = "r";
-
-    public Baba(Point2D position) {
-        this.position = position;
+    public Baba(Point2D position, Direction facing) {
+        super(position, facing);
     }
 
     @Override
     public String getName() {
-        return "baba-" + direction;
+        return "baba-" + letterFor(getFacing());
     }
-
-    @Override
-    public Point2D getPosition() {
-        return position;
-    }
-
-    @Override
-    public int getLayer() {
-        return 25;
-    }
-
-    public void move(Direction d) {
-        Random rand = new Random();
-        position = new Point2D(rand.nextInt(10), rand.nextInt(10));
+    //Uso de IA claude  oppus5.5 para fazer o metodo letterFor
+    private char letterFor(Direction d){
+        switch (d) {
+            case UP:    return 'u';
+            case DOWN:  return 'd';
+            case LEFT:  return 'l';
+            default:    return 'r';
+        }
     }
 }
