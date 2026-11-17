@@ -54,6 +54,7 @@ public class Room {
 //        r.player = baba;
 //        return r;
         Room r = new Room();
+        //yyyyyy
         r.setName(f.getName());
         Scanner s = new Scanner(f);
         int numLinha;
