@@ -73,118 +73,67 @@ import pt.iscte.poo.gui.ImageTile;
 import pt.iscte.poo.utils.Point2D;
 
 public class Room {
-    private List<ImageTile> objects;
-    private String roomName;
+    private List<GameObject> objects; // Ajustado para List<GameObject> conforme o UML
+    private int width;
+    private int height;
     private Baba player;
 
     public Room(String roomName) {
-        this.roomName = roomName;
         this.objects = new ArrayList<>();
     }
 
-    /**
-     * Lê o ficheiro de configuração do nível (roomN.txt) e cria a sala correspondente.
-     * @param file Ficheiro de configuração do nível.
-     * @return Objeto Room preenchido com todos os elementos.
-     */
     public static Room readRoom(File file) {
         Room room = new Room(file.getName());
         try (Scanner scanner = new Scanner(file)) {
             if (!scanner.hasNextLine()) return room;
 
-            // 1. Ler dimensões do mapa: <cols>,<rows>[cite: 3]
+            // 1. Ler dimensões
             String[] dimensions = scanner.nextLine().split(",");
-            int cols = Integer.parseInt(dimensions[0].trim());
-            int rows = Integer.parseInt(dimensions[1].trim());
+            room.width = Integer.parseInt(dimensions[0].trim());
+            room.height = Integer.parseInt(dimensions[1].trim());
 
-            // Colocar Dirt (chão) em todas as células do mapa por defeito[cite: 3]
-            for (int x = 0; x < cols; x++) {
-                for (int y = 0; y < rows; y++) {
-                    room.objects.add(new Dirt(new Point2D(x, y)));
+            // Colocar Dirt (chão) em todas as células por defeito
+            for (int x = 0; x < room.width; x++) {
+                for (int y = 0; y < room.height; y++) {
+                    room.objects.add(ObjectFactory.createFromSymbol(' ', new Point2D(x, y), room));
                 }
             }
 
-            // 2. Ler as 'rows' linhas seguintes com o mapa fixo do ambiente[cite: 3]
+            // 2. Ler mapa fixo
             int currentRow = 0;
-            while (scanner.hasNextLine() && currentRow < rows) {
+            while (scanner.hasNextLine() && currentRow < room.height) {
                 String line = scanner.nextLine();
-                if (line.isEmpty() && currentRow == 0) continue; // Ignorar linha vazia inicial se existir
-                if (line.isEmpty()) break; // Linha em branco separa o mapa dos objetos
+                if (line.isEmpty() && currentRow == 0) continue;
+                if (line.isEmpty()) break;
 
-                for (int x = 0; x < line.length() && x < cols; x++) {
+                for (int x = 0; x < line.length() && x < room.width; x++) {
                     char c = line.charAt(x);
-                    Point2D pos = new Point2D(x, currentRow);
-                    switch (c) {
-                        case 'X': // Parede[cite: 3]
-                            room.objects.add(new Wall(pos));
-                            break;
-                        case 'x': // Parede rachada[cite: 3]
-                            room.objects.add(new CrackedWall(pos));
-                            break;
-                        case 'H': // Buraco[cite: 3]
-                            room.objects.add(new Hole(pos));
-                            break;
-                        case 'g': // Erva decorativa[cite: 3]
-                            room.objects.add(new Grass(pos));
-                            break;
-                        default:
-                            // Espaço vazio -> mantém apenas o Dirt de fundo[cite: 3]
-                            break;
+                    if (c != ' ') {
+                        Point2D pos = new Point2D(x, currentRow);
+                        GameObject obj = ObjectFactory.createFromSymbol(c, pos, room);
+                        if (obj != null) room.objects.add(obj);
                     }
                 }
                 currentRow++;
             }
 
-            // 3. Ler a lista de objetos do nível após a linha em branco[cite: 3]
+            // 3. Ler objetos dinâmicos e palavras
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();
                 if (line.isEmpty()) continue;
 
                 String[] parts = line.split(",");
-                String type = parts[0].trim();
+                String name = parts[0].trim();
                 int x = Integer.parseInt(parts[1].trim());
                 int y = Integer.parseInt(parts[2].trim());
                 Point2D pos = new Point2D(x, y);
 
-                ImageTile obj = null;
-                switch (type) {
-                    case "baba":
-                        // O Baba pode ter direção opcional (ex: baba,8,6,r)[cite: 3]
-                        room.player = new Baba(pos);
-                        obj = room.player;
-                        break;
-                    case "rock":
-                        obj = new Rock(pos);
-                        break;
-                    case "bomb":
-                        obj = new Bomb(pos);
-                        break;
-                    case "box":
-                        obj = new Box(pos);
-                        break;
-                    case "flag":
-                        obj = new Flag(pos);
-                        break;
-                    case "wordBox":
-                        obj = new WordBox(pos);
-                        break;
-                    case "wordIs":
-                        obj = new WordIs(pos);
-                        break;
-                    case "wordStop":
-                        obj = new WordStop(pos);
-                        break;
-                    case "wordMove":
-                        obj = new WordMove(pos);
-                        break;
-                    case "wordWin":
-                        obj = new WordWin(pos);
-                        break;
-                    default:
-                        break;
-                }
+                GameObject obj = ObjectFactory.createFromName(name, pos, room);
                 if (obj != null) {
                     room.objects.add(obj);
+                    if (obj instanceof Baba) {
+                        room.player = (Baba) obj;
+                    }
                 }
             }
 
@@ -194,7 +143,9 @@ public class Room {
         return room;
     }
 
-    public List<ImageTile> getObjects() {
+    public List<GameObject> getObjects() {
+        List<ImageTile> tiles = new ArrayList<>(objects);
+        // Retorna a lista adaptada para o ImageGUI se necessário
         return objects;
     }
 
