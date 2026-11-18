@@ -109,15 +109,33 @@ public class Room {
             }
         }
     }
-    public void readObjects(Scanner scanner){
-        while(scanner.hasNextLine()){
+    private void readObjects(Scanner scanner) {
+        while (scanner.hasNextLine()) {
             String linha = scanner.nextLine().trim();
-            if(!linha.isEmpty()){
-                GameObject obj= ObjectFactory.createObject(linha);
-                if(! isInside(obj.getPosition())){
-                    throw new IllegalArgumentException("objeto fora do mapa");
+            if (!linha.isEmpty()) {
+                String[] parts = linha.split(",");
+                if (parts.length < 3) {
+                    throw new IllegalArgumentException("linha invalida: " + linha);
                 }
-                addObject(obj);
+                String name = parts[0].trim();
+                Point2D p;
+                try {
+                    int x = Integer.parseInt(parts[1].trim());
+                    int y = Integer.parseInt(parts[2].trim());
+                    p = new Point2D(x, y);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("coordenadas invalidas: " + linha);
+                }
+                if (!isInside(p)) {
+                    throw new IllegalArgumentException("objeto fora do mapa: " + linha);
+                }
+
+                String direction = null;
+                if (parts.length >= 4) {
+                    direction = parts[3].trim();
+                }
+
+                addObject(ObjectFactory.createObject(name, p, direction));
             }
         }
     }
