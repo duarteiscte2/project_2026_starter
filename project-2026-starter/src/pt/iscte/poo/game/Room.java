@@ -36,8 +36,9 @@ public class Room {
     }
     public List<GameObject> getObjectsAt(Point2D p){
         List<GameObject> result= new ArrayList<>();
-        for(GameObject o : objects){
-            result.add(o);
+        for(GameObject o: objects){
+            if(o.getPosition().equals(p))
+                result.add(o);
         }
         return result;
     }
@@ -98,7 +99,7 @@ public class Room {
                 throw new IllegalArgumentException("mapa incompleto");
             }
             String linha = scanner.nextLine();
-            for(int x=0; x<height; x++ ){
+            for(int x=0; x<width; x++ ){
                 Point2D ponto = new Point2D(x,y);
                 addObject(new Dirt(ponto));
                 char c  = linha.charAt(x);
