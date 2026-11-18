@@ -29,7 +29,7 @@ public abstract class Actor extends GameObject {
     }
     public boolean canEnter(Point2D p){
         Room room = getRoom();
-        return room.isInside(p) && room.hasSolidAt(p);
+        return room.isInside(p) && !room.hasSolidAt(p);
     }
     @Override
     public int getLayer(){
