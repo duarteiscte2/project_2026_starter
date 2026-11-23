@@ -30,5 +30,8 @@ public abstract class GameObject implements ImageTile {
     public boolean isSolid(){
         return false;
     }
+    public boolean isGoal(){
+        return false;
+    }
 
 }

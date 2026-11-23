@@ -10,4 +10,16 @@ public class Box extends MovableObject{
     public String getName(){
         return "box";
     }
+    @Override
+    public boolean isPushable(){
+        return getRoom().hasRule("MOVE");
+    }
+    @Override
+    public boolean isSolid(){
+        return getRoom().hasRule("STOP");
+    }
+    @Override
+    public boolean isGoal(){
+        return getRoom().hasRule("WIN");
+    }
 }

@@ -10,4 +10,8 @@ public class WordWin extends PropertyWord{
     public String getName(){
         return "word-win";
     }
+    @Override
+    public String getProperty(){
+        return "WIN";
+    }
 }

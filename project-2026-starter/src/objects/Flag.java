@@ -10,4 +10,8 @@ public class Flag extends MovableObject{
     public String getName(){
         return "flag";
     }
+    @Override
+    public boolean isGoal(){
+        return true;
+    }
 }

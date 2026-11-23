@@ -10,4 +10,8 @@ public class WordStop extends PropertyWord{
     public String getName(){
         return "word-stop";
     }
+    @Override
+    public String getProperty(){
+            return "STOP";
+    }
 }

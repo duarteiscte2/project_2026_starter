@@ -6,10 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import objects.Baba;
-import objects.Dirt;
-import objects.GameObject;
+import objects.*;
 import pt.iscte.poo.gui.ImageTile;
+import pt.iscte.poo.utils.Direction;
 import pt.iscte.poo.utils.Point2D;
 
 import pt.iscte.poo.game.ObjectFactory;
@@ -152,5 +151,46 @@ public class Room {
 
     public Baba getPlayer() {
         return player;
+    }
+    public boolean canEnter(Point2D p, Direction d) {
+        if (!isInside(p))
+            return false;
+        for (GameObject o : getObjectsAt(p)) {
+            if (isPushable(o)) {
+                if (!((Pushable) o).canMove(d))
+                    return false;
+            } else if (o.isSolid()) {
+                return false;
+            }
+        }
+        return true;
+    }
+    private boolean isPushable(GameObject o) {
+        return o instanceof Pushable && ((Pushable) o).isPushable();
+    }
+    public void moveObject(GameObject obj, Direction d){
+        Point2D next= obj.getPosition().plus(d.asVector());
+        for(GameObject o: getObjectsAt(next) ){
+            if(isPushable(o)){
+                ((Pushable)o).push(d);
+            }
+        }
+        obj.setPosition(next);
+    }
+    public boolean hasGoalAt(Point2D p){
+        for(GameObject o: getObjectsAt(p)){
+            if(o.isGoal()){
+                return true;
+            }
+        }
+        return false;
+    }
+    public Word getWordAt(Point2D p){
+        for(GameObject o: getObjectsAt(p) ){
+            if(o instanceof Word){
+                return (Word) o;
+            }
+        }
+        return null;
     }
 }

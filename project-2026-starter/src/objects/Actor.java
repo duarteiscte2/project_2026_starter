@@ -19,18 +19,20 @@ public abstract class Actor extends GameObject {
         this.facing = facing;
     }
     public boolean move(Direction d){
+        Room room= getRoom();
         setFacing(d);
         Point2D next= getPosition().plus(d.asVector());
-        if(!canEnter(next)){
+        if(room.hasGoalAt(next)){
+            setPosition(next);
+            return true;
+        }
+        if(!room.canEnter(next, d)){
             return false;
         }
-        setPosition(next);
+        room.moveObject(this, d);
         return true;
     }
-    public boolean canEnter(Point2D p){
-        Room room = getRoom();
-        return room.isInside(p) && !room.hasSolidAt(p);
-    }
+
     @Override
     public int getLayer(){
         return 4;

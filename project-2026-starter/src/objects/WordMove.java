@@ -10,4 +10,8 @@ public class WordMove extends PropertyWord{
     public String getName(){
         return "word-move";
     }
+    @Override
+    public String getProperty(){
+        return "MOVE";
+    }
 }
