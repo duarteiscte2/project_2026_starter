@@ -2,9 +2,7 @@ package pt.iscte.poo.game;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import objects.*;
 import pt.iscte.poo.gui.ImageTile;
@@ -12,6 +10,8 @@ import pt.iscte.poo.utils.Direction;
 import pt.iscte.poo.utils.Point2D;
 
 import pt.iscte.poo.game.ObjectFactory;
+import pt.iscte.poo.utils.Vector2D;
+
 
 public class Room {
 
@@ -20,6 +20,7 @@ public class Room {
     private Baba player;
     private int width;
     private int height;
+    private Set<String> rules= new HashSet<>();
 
     public Room(String roomName, int width, int height) {
         this.roomName = roomName;
@@ -33,6 +34,7 @@ public class Room {
     public String getName() {
         return roomName;
     }
+
     public List<GameObject> getObjectsAt(Point2D p){
         List<GameObject> result= new ArrayList<>();
         for(GameObject o: objects){
@@ -152,6 +154,7 @@ public class Room {
     public Baba getPlayer() {
         return player;
     }
+
     public boolean canEnter(Point2D p, Direction d) {
         if (!isInside(p))
             return false;
@@ -168,6 +171,7 @@ public class Room {
     private boolean isPushable(GameObject o) {
         return o instanceof Pushable && ((Pushable) o).isPushable();
     }
+
     public void moveObject(GameObject obj, Direction d){
         Point2D next= obj.getPosition().plus(d.asVector());
         for(GameObject o: getObjectsAt(next) ){
@@ -192,5 +196,37 @@ public class Room {
             }
         }
         return null;
+    }
+    public boolean isGoalReached(){
+        return hasGoalAt(player.getPosition());
+    }
+
+    public void updateRules(){
+        rules.clear();
+        for(GameObject o: objects){
+            if(o instanceof WordBox){
+                checkRule(o.getPosition(),Direction.RIGHT.asVector());
+                checkRule(o.getPosition(), Direction.DOWN.asVector());
+            }
+
+        }
+    }
+
+    private void checkRule(Point2D boxPosition,  Vector2D d){
+        Point2D isPosition = boxPosition.plus(d);
+        Point2D propertyPosition=isPosition.plus(d);
+        Word is= getWordAt(isPosition);
+        Word property = getWordAt(propertyPosition);
+        if(is instanceof WordIs && property instanceof PropertyWord){
+            rules.add(((PropertyWord) property).getProperty());
+        }
+    }
+
+    public boolean hasRule(String property){
+        return rules.contains(property);
+    }
+
+    public Set<String> getRules() {
+        return rules;
     }
 }

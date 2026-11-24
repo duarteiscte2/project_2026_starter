@@ -19,10 +19,11 @@ public class GameEngine implements Observer {
     private int currentLevel;
     private int moves;
     private int lastTickProcessed = 0;
+    private boolean levelCompleted=false;
 
     private GameEngine() {
         try {
-            currentRoom = Room.readRoom(new File(ROOMS_DIRECTORY, "room0.txt"));
+            currentRoom = Room.readRoom(new File(ROOMS_DIRECTORY, "room3.txt"));
         } catch (FileNotFoundException e) {
             ImageGUI.getInstance().showMessage("Erro", "Nivel 0 nao encontrado");
             System.exit(1);
@@ -43,20 +44,19 @@ public class GameEngine implements Observer {
     @Override
     public void update(Observed source) {
         int t = ImageGUI.getInstance().getTicks();
-
         if (t > lastTickProcessed) {
-            // o contador de ticks avancou: esta chamada veio de um tick
             while (lastTickProcessed < t) {
                 processTick();
             }
-        } else if (ImageGUI.getInstance().wasKeyPressed()) {
-            // senao, veio de uma tecla
+        } else if (ImageGUI.getInstance().wasKeyPressed() && !levelCompleted) {
             int k = ImageGUI.getInstance().keyPressed();
             if (Direction.isDirection(k)) {
                 Direction d = Direction.directionFor(k);
                 if (getPlayer().move(d)) {
                     moves++;
+                    currentRoom.updateRules();
                     updateStatus();
+                    checkGoal();
                 }
             }
         }
@@ -73,10 +73,25 @@ public class GameEngine implements Observer {
     }
 
     private void updateStatus() {
+        String rules= "";
+        for(String r: currentRoom.getRules()){
+            rules+= "  BOX IS " + r;
+        }
+        if(rules.isEmpty())
+            rules="  nenhuma";
         ImageGUI.getInstance().setStatusMessage("Nivel " + currentLevel + "   |   Movimentos: " + moves);
     }
 
     public Baba getPlayer() {
         return currentRoom.getPlayer();
     }
+
+    private void checkGoal(){
+        if(currentRoom.isGoalReached()){
+            levelCompleted=true;
+            ImageGUI.getInstance().setStatusMessage("NIVEL " +currentLevel+ " concluido em " + moves +" movimentos!");
+            ImageGUI.getInstance().showMessage("Parabens ","NIVEL "+ currentLevel+ " concluido em " + moves +" movimentos!");
+        }
+    }
+
 }

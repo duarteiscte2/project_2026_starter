@@ -1,0 +1,20 @@
+13,9
+XXXXXXXXXXXXX
+X     X    gX
+X     X     X
+Xg    X     X
+X           X
+X     X XXXXX
+X H   X X   X
+X  H  X X   X
+XXXXXXXXXXXXX
+
+baba,4,6,u
+wordBox,1,2
+wordIs,2,2
+wordStop,3,2
+box,6,4
+wordWin,9,2
+rock,8,4
+bomb,7,6
+flag,10,6
